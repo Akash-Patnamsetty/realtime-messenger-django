@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Room</title>
+    <style>
+        body { font-family: Arial; background: #f4f4f4; }
+        #chat-log { height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; background: white; }
+        #chat-message-input { width: 80%; padding: 8px; }
+        #chat-message-submit { width: 15%; padding: 8px; }
+        .message { margin-bottom: 5px; }
+        .self { color: blue; }
+        .other { color: green; }
+    </style>
+</head>
+<body>
+    <h2>Chat Room: {{ room_name }} <br> current user:{{currentuser}}</h2>
+    
+    <div id="chat-log"></div>
+
+    <input id="chat-message-input" type="text" placeholder="Type your message..." autocomplete="off">
+    <button id="chat-message-submit">Send</button>
+
+    <script>
+        
+        // 1️⃣ — WebSocket URL
+        const roomName = "{{ room_name }}";
+        console.log(roomName, window.location.host)
+        const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+        console.log(wsScheme)
+        const chatSocket = new WebSocket(
+            wsScheme + '://' + window.location.host + '/ws/chat/' + roomName + '/'
+        );
+        console.log("aftre",chatSocket)
+        // 2️⃣ — When connection opens
+        chatSocket.onopen = function(e) {
+            console.log("Connected to WebSocket room:", roomName);
+        };
+
+        // 3️⃣ — When a message is received from server
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+
+            // Message History (when page loads)
+            if (data.type === "message_history") {
+                data.messages.forEach(msg => {
+                    const el = document.createElement("div");
+                    el.className = "message";
+                    el.textContent = `${msg.sender}: ${msg.message}`;
+                    document.querySelector("#chat-log").appendChild(el);
+                });
+            } 
+
+            // Real-time new message
+            if (data.type === "chat") {
+                const el = document.createElement("div");
+                el.className = "message";
+                el.textContent = `${data.sender}: ${data.message}`;
+                document.querySelector("#chat-log").appendChild(el);
+            }
+
+            // Auto-scroll
+            const chatLog = document.querySelector("#chat-log");
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }; 
+
+        // 4️⃣ — When connection closes
+        chatSocket.onclose = function(e) {
+            console.log("WebSocket closed unexpectedly");
+        }; 
+
+        // 5️⃣ — Send message to backend
+        document.querySelector("#chat-message-submit").onclick = function(e) {
+            const messageInputDom = document.querySelector("#chat-message-input");
+            const message = messageInputDom.value.trim();
+            console.log("front end :",message)
+            if (message !== "") {
+                chatSocket.send(JSON.stringify({ 'message': message }));
+                messageInputDom.value = "";
+            }
+        };
+    </script>
+</body>
+</html>

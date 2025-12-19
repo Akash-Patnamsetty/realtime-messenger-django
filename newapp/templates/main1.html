@@ -1,0 +1,164 @@
+<!-- chat/templates/chat/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Messenger{% endblock %}</title>
+    <style>
+        :root {
+            --color-primary: #0084ff;
+            --color-background: #f0f2f5;
+            --color-surface: #ffffff;
+            --color-text: #050505;
+            --color-text-secondary: #65676b;
+            --color-border: #e4e6eb;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-background);
+            color: var(--color-text);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .nav {
+            background: var(--color-surface);
+            padding: 15px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .nav h1 {
+            color: var(--color-primary);
+            font-size: 24px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-secondary {
+            background: var(--color-text-secondary);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .auth-box {
+            max-width: 400px;
+            margin: 50px auto;
+            background: var(--color-surface);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .auth-box h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c00;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .link {
+            color: var(--color-primary);
+            text-decoration: none;
+            margin-top: 15px;
+            display: block;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+    <h1>Messenger</h1>
+    <div>
+        <span style="margin-right: 15px;">Welcome, {{ currentuser.username }}</span>
+        <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2 style="margin-bottom: 20px;">Select a user to chat</h2>
+    
+    <div style="background: var(--color-surface); border-radius: 12px; overflow: hidden;">
+        {% for i in users %}
+            <a href="{% url 'chartwithuser' i.id %}" style="display: block; padding: 15px 20px; border-bottom: 1px solid var(--color-border); text-decoration: none; color: var(--color-text); transition: background 0.2s;">
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--color-primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px;">
+                        {{ i.username|first|upper }} {{i.username.id}}
+                    </div>
+                    <div style="margin-left: 15px;">
+                        <div style="font-weight: 500;">{{i.username}} and </div>
+                        <div style="color: var(--color-text-secondary); font-size: 14px;">Click to start chatting</div>
+                    </div>
+                </div>
+            </a>
+            {%endfor%}
+            <div style="padding: 40px; text-align: center; color: var(--color-text-secondary);">
+                No other users found. Register more accounts to start chatting!
+            </div>
+        
+    </div>
+</div>
+
+<style>
+    a:hover {
+        background: var(--color-background) !important;
+    }
+</style>
+
+    
+</body>
+</html>
+
+<!-- chat/templates/chat/users.html -->
