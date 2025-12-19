@@ -35,7 +35,6 @@ def logout_view(request):
 @login_required
 def room_view(request):
     users=User.objects.exclude(id=request.user.id)
-   # print(request.user)
   #  room, _ = Room.objects.get_or_create(name=room_name)
     return render(request, "main1.html",{"users":users,"currentuser":request.user})
 
